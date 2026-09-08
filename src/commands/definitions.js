@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ChannelType } = require('discord.js');
 const GIVEAWAY_MODES = [{ name: 'Standard', value: 'standard' }, { name: 'Double or Keep', value: 'double_or_keep' }, { name: 'Rock Paper Scissors', value: 'rps' }, { name: 'Fast Click', value: 'fast_click' }];
-const PRICE_ITEMS = ['Skeleton Spawner','Zombie Spawner','Spider Spawner','Blaze Spawner','Creeper Spawner','Iron Golem Spawner','Cow Spawner','Sheep Spawner','Pig Spawner','Skelly Key'].map((n) => ({ name: n, value: n }));
+const PRICE_ITEMS = ['Skeleton Spawner','Zombie Spawner','Spider Spawner','Blaze Spawner','Creeper Spawner','Iron Golem Spawner','Cow Spawner','Sheep Spawner','Pig Spawner'].map((n) => ({ name: n, value: n }));
 function buildCommands() {
   return [
     new SlashCommandBuilder().setName('help').setDescription('Show commands you can use'),
@@ -44,16 +44,10 @@ function buildCommands() {
         .addStringOption((o) => o.setName('price').setRequired(true).setDescription('Price like 50m'))
         .addStringOption((o) => o.setName('build').setRequired(true).setDescription('What is being built')))
       .addSubcommand((s) => s.setName('list').setDescription('List recent builds')),
-    new SlashCommandBuilder().setName('price').setDescription('Skelly and spawner prices')
-      .addSubcommand((s) => s.setName('lookup').setDescription('Look up buy and sell price').addStringOption((o) => o.setName('item').setRequired(true).setDescription('Item').addChoices(...PRICE_ITEMS)))
-      .addSubcommand((s) => s.setName('list').setDescription('Show all skelly and spawner prices'))
-      .addSubcommand((s) => s.setName('update').setDescription('Staff: update a price').addStringOption((o) => o.setName('item').setRequired(true).setDescription('Item').addChoices(...PRICE_ITEMS))),
-    new SlashCommandBuilder().setName('stats').setDescription('Live DonutSMP player stats').addStringOption((o) => o.setName('player').setDescription('IGN').setRequired(true)).addStringOption((o) => o.setName('fields').setDescription('Optional fields like money,kills')),
-    new SlashCommandBuilder().setName('online').setDescription('Check if a DonutSMP player is online').addStringOption((o) => o.setName('player').setDescription('IGN').setRequired(true)),
-    new SlashCommandBuilder().setName('ah').setDescription('Live auction house')
-      .addSubcommand((s) => s.setName('tracked').setDescription('All tracked auction prices'))
-      .addSubcommand((s) => s.setName('item').setDescription('One tracked item').addStringOption((o) => o.setName('item').setDescription('Item name').setRequired(true)))
-      .addSubcommand((s) => s.setName('search').setDescription('Search live auctions').addStringOption((o) => o.setName('query').setDescription('Search text').setRequired(true))),
+    new SlashCommandBuilder().setName('price').setDescription('Spawner prices')
+      .addSubcommand((s) => s.setName('lookup').setDescription('Look up buy and sell price').addStringOption((o) => o.setName('item').setRequired(true).setDescription('Spawner').addChoices(...PRICE_ITEMS)))
+      .addSubcommand((s) => s.setName('list').setDescription('Show all spawner prices'))
+      .addSubcommand((s) => s.setName('update').setDescription('Staff: update a price').addStringOption((o) => o.setName('item').setRequired(true).setDescription('Spawner').addChoices(...PRICE_ITEMS))),
     new SlashCommandBuilder().setName('builder').setDescription('Builder balances').addSubcommand((s) => s.setName('balance').setDescription('View builder balance')).addSubcommand((s) => s.setName('stats').setDescription('View builder stats')),
     new SlashCommandBuilder().setName('config').setDescription('Configure channels').addSubcommand((s) => s.setName('view').setDescription('View configuration'))
   ].map((c) => c.toJSON());

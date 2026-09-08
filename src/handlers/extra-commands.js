@@ -8,7 +8,6 @@ const builds = require('../systems/builds');
 const giveaways = require('../systems/giveaways');
 const prices = require('../systems/prices');
 const { paymentButtons } = require('../systems/pay-buttons');
-const donut = require('../systems/donuteasy');
 
 function deny(interaction, message) {
   return interaction.reply({ ephemeral: true, embeds: [error('Not allowed', message)] });
@@ -25,24 +24,7 @@ function timeAgo(iso) {
 async function handleExtra(interaction, client) {
   const name = interaction.commandName;
   const sub = interaction.options.getSubcommand(false);
-
   if (name === 'showcase') return interaction.reply({ embeds: require('./showcase').showcaseEmbeds() });
-
-  if (name === 'stats') {
-    try { return interaction.reply({ embeds: [donut.statsEmbed(interaction.options.getString('player', true), await donut.playerStats(interaction.options.getString('player', true), interaction.options.getString('fields') || undefined))] }); }
-    catch (err) { return deny(interaction, err.message); }
-  }
-  if (name === 'online') {
-    try { return interaction.reply({ embeds: [donut.onlineEmbed(interaction.options.getString('player', true), await donut.playerOnline(interaction.options.getString('player', true)))] }); }
-    catch (err) { return deny(interaction, err.message); }
-  }
-  if (name === 'ah') {
-    try {
-      if (sub === 'item') return interaction.reply({ embeds: [donut.auctionEmbed('AH — ' + interaction.options.getString('item', true), await donut.auctionItem(interaction.options.getString('item', true)))] });
-      if (sub === 'search') return interaction.reply({ embeds: [donut.auctionEmbed('AH search — ' + interaction.options.getString('query', true), await donut.auctionSearch(interaction.options.getString('query', true)))] });
-      return interaction.reply({ embeds: [donut.auctionEmbed('Tracked auction prices', await donut.auctionAll())] });
-    } catch (err) { return deny(interaction, err.message); }
-  }
 
   if (name === 'payment' && (sub === 'create' || sub === 'complete')) {
     const access = getAccess(interaction.member, interaction.guildId);
