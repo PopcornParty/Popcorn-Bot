@@ -2,7 +2,7 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, Partials, Events, ActivityType } = require('discord.js');
 const logger = require('./utils/logger');
 const { initDatabase } = require('./db');
-const { deployCommands } = require('./deploy-commands');
+const { deployCommands, deployToGuild } = require('./deploy-commands');
 const { handleChatCommand } = require('./handlers/commands');
 const { handleButton, handleModal, handleSelect } = require('./handlers/components');
 const { startScheduler } = require('./scheduler');
@@ -22,9 +22,14 @@ const client = new Client({
 
 client.once(Events.ClientReady, async (readyClient) => {
   logger.info('Logged in as ' + readyClient.user.tag);
-  readyClient.user.setPresence({ activities: [{ name: 'Donut Nation 2', type: ActivityType.Watching }], status: 'online' });
+  readyClient.user.setPresence({ activities: [{ name: 'giveaways and builds', type: ActivityType.Watching }], status: 'online' });
   try { await deployCommands(readyClient); } catch (err) { logger.warn('Slash command deploy after login failed: ' + err.message); }
   startScheduler(readyClient);
+});
+
+client.on(Events.GuildCreate, async (guild) => {
+  logger.info('Joined server ' + guild.name + ' (' + guild.id + ')');
+  try { await deployToGuild(guild.id); } catch (err) { logger.warn('Could not register commands in new server: ' + err.message); }
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -49,7 +54,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (interaction.isStringSelectMenu()) await handleSelect(interaction, client);
   } catch (err) {
     logger.error('Interaction failed:', err);
-    const payload = { ephemeral: true, embeds: [{ color: 0xed4245, title: 'Something went wrong', description: 'The bot hit an error handling that action.', footer: { text: 'Donut Nation 2' } }] };
+    const payload = { ephemeral: true, embeds: [{ color: 0xed4245, title: 'Something went wrong', description: 'The bot hit an error handling that action.', footer: { text: 'Server Bot' } }] };
     try {
       if (interaction.replied || interaction.deferred) await interaction.followUp(payload);
       else await interaction.reply(payload);
