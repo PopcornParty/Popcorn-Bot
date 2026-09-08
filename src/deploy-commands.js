@@ -14,28 +14,26 @@ async function deployToGuild(guildId) {
   const { rest, clientId } = restClient();
   const body = buildCommands();
   await rest.put(Routes.applicationGuildCommands(clientId, String(guildId).trim()), { body });
-  logger.info('Registered ' + body.length + ' commands in guild ' + guildId + ': ' + body.map((c) => c.name).join(', '));
+  logger.info('Registered ' + body.length + ' commands in guild ' + guildId);
+}
+
+async function deployGlobal() {
+  const { rest, clientId } = restClient();
+  const body = buildCommands();
+  await rest.put(Routes.applicationCommands(clientId), { body });
+  logger.info('Registered ' + body.length + ' global commands: ' + body.map((c) => c.name).join(', '));
 }
 
 async function deployCommands(client) {
   const body = buildCommands();
-  const names = body.map((c) => c.name).join(', ');
-  logger.info('Command list: ' + names);
-  if (client && client.guilds && client.guilds.cache && client.guilds.cache.size) {
+  logger.info('Command list: ' + body.map((c) => c.name).join(', '));
+  try { await deployGlobal(); } catch (err) { logger.warn('Global command deploy failed: ' + err.message); }
+  if (client && client.guilds && client.guilds.cache) {
     for (const guild of client.guilds.cache.values()) {
       try { await deployToGuild(guild.id); }
       catch (err) { logger.warn('Could not register commands in ' + guild.id + ': ' + err.message); }
     }
-    return;
   }
-  const guildId = String(process.env.GUILD_ID || process.env.SERVER_ID || '').trim();
-  if (guildId) {
-    await deployToGuild(guildId);
-    return;
-  }
-  const { rest, clientId } = restClient();
-  await rest.put(Routes.applicationCommands(clientId), { body });
-  logger.info('Registered ' + body.length + ' global commands: ' + names);
 }
 
-module.exports = { deployCommands, deployToGuild };
+module.exports = { deployCommands, deployToGuild, deployGlobal };
